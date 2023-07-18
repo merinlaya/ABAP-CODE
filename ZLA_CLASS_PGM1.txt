@@ -1,0 +1,63 @@
+8.ZLA_CLASS_PGM1
+*&---------------------------------------------------------------------*
+*& Report ZLA_CLASS_PGM1
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZLA_CLASS_PGM1.
+CLASS lcl_counter DEFINITION.
+  PUBLIC SECTION.
+  DATA count type i.
+  METHODS next_number EXPORTING number type i.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+CLASS lcl_counter IMPLEMENTATION.
+  METHOD next_number.
+    number = count + 1.
+count = number.
+    ENDMETHOD.
+  ENDCLASS.
+
+  DATA o_doc type ref to lcl_counter.
+  DATA o_tag type ref to lcl_counter.
+
+  DATA v_tag type i.
+  DATA v_doc type i.
+
+  START-OF-SELECTION.
+  CREATE OBJECT o_doc.
+  CREATE OBJECT o_tag.
+
+  o_doc->next_number(
+ IMPORTING
+    number = v_doc
+    ).
+
+   o_doc->next_number(
+  IMPORTING
+    number = v_tag
+    ).
+
+   o_doc->next_number(
+ IMPORTING
+    number = v_doc
+    ).
+
+   o_doc->next_number(
+  IMPORTING
+    number = v_tag
+    ).
+   o_doc->next_number(
+ IMPORTING
+    number = v_doc
+    ).
+
+   o_doc->next_number(
+  IMPORTING
+    number = v_tag
+    ).
+  o_doc->next_number(
+  IMPORTING
+    number = v_tag
+    ).
