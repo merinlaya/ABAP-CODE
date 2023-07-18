@@ -1,0 +1,31 @@
+10.ZLA_DEMO_INTALV
+*&---------------------------------------------------------------------*
+*& Report ZLA_DEMO_INTALV
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZLA_DEMO_INTALV.
+DATA v_vbeln TYPE zla_vbrk-vbeln.
+DATA : it_vbrk TYPE TABLE OF zla_vbrk,
+       wa_vbrk LIKE LINE OF it_vbrk.
+DATA : it_vbrp TYPE TABLE OF zla_vbrp,
+       wa_vbrp LIKE LINE OF it_vbrp.
+
+SELECT-OPTIONS s_VBELN FOR v_vbeln.
+SELECT * FROM zla_vbrk INTO TABLE it_vbrk WHERE vbeln IN s_vbeln.
+LOOP AT it_vbrk INTO wa_vbrk.
+
+    WRITE : / wa_vbrk-vbeln,
+           wa_vbrk-kunrg,
+           wa_vbrk-fkdat,
+           wa_vbrk-netwr LEFT-JUSTIFIED.
+ENDLOOP.
+AT LINE-SELECTION.
+SELECT * FROM zla_vbrp INTO TABLE it_vbrp WHERE vbeln = sy-lisel.
+LOOP AT it_vbrp INTO wa_vbrp.
+     WRITE : / wa_vbrp-posnr,
+         wa_vbrp-matnr,
+         wa_vbrp-fkimg,
+         wa_vbrp-vrkme,
+         wa_vbrp-netwr.
+ ENDLOOP.
