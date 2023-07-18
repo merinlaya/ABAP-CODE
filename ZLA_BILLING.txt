@@ -1,0 +1,66 @@
+1.ZLA_BILLING
+
+*&---------------------------------------------------------------------*
+*& Report ZLA_BILLING
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zla_billing.
+PARAMETERS: p_VBELN TYPE zla_vbrk-vbeln.
+
+TYPES: BEGIN OF ty_kna1,
+         name1 TYPE kna1-name1,
+       END OF ty_kna1.
+
+TYPES: BEGIN OF ty_t006a,
+       mseht TYPE t006a-mseht,
+       END OF ty_t006a.
+
+TYPES: BEGIN OF ty_ZLA_VBRK,
+         vbeln TYPE zla_vbrk-vbeln,
+         fkdat TYPE zla_vbrk-fkdat,
+         kunrg TYPE zla_vbrk-kunrg,
+         netwr TYPE zla_vbrk-netwr,
+       END OF ty_ZLA_VBRK.
+
+TYPES :BEGIN OF ty_ZLA_VBRP,
+         vbeln TYPE zla_vbrp-vbeln,
+         posnr TYPE zla_vbrp-posnr,
+         matnr TYPE zla_vbrp-matnr,
+         fkimg TYPE zla_vbrp-fkimg,
+         vrkme TYPE zla_vbrp-vrkme,
+         netwr TYPE zla_vbrp-netwr,
+       END OF ty_ZLA_VBRP.
+
+DATA :st_ZLA_VBRK TYPE ty_ZLA_VBRK,
+      st_ZLA_VBRP TYPE ty_ZLA_VBRP,
+      v_name1     TYPE ty_kna1,
+      v_mseht     TYPE ty_t006a.
+
+
+
+*
+SELECT SINGLE vbeln fkdat kunrg netwr FROM zla_vbrk INTO st_ZLA_VBRK WHERE vbeln EQ p_VBELN.
+SELECT SINGLE name1 FROM kna1 INTO v_name1 WHERE kunnr EQ st_zla_vbrk-kunrg.
+*  SELECT SINGLE name1 FROM t001w INTO plant_name WHERE werks EQ p_werks
+
+WRITE: /'Doc No:',st_ZLA_VBRK-vbeln,
+       /'Payer Name:',v_name1,
+       /'Date:',st_ZLA_VBRK-fkdat,
+       /'NetValue:',st_ZLA_VBRK-netwr.
+*
+WRITE: /'Item',
+        20 'Material',
+        40 'Qty',
+        60'UoM',
+        80 'NetValue'.
+
+SELECT vbeln posnr matnr fkimg vrkme netwr FROM zla_vbrp INTO st_ZLA_VBRP WHERE vbeln EQ p_VBELN.
+  SELECT SINGLE mseht FROM t006a INTO v_mseht WHERE msehi EQ st_zla_vbrp-vrkme and spras eq sy-langu.
+
+  WRITE:/ st_ZLA_VBRP-posnr,
+       20 st_ZLA_VBRP-matnr,
+       30 st_ZLA_VBRP-fkimg,
+       60 v_mseht,
+       68 st_ZLA_VBRP-netwr.
+ENDSELECT.
