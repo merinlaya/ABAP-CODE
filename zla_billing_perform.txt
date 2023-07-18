@@ -1,0 +1,72 @@
+6.zla_billing_perform
+*&---------------------------------------------------------------------*
+*& Report ZLA_BILLING_PERFORM
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZLA_BILLING_PERFORM.
+DATA : it_header TYPE ZDEMO_T_HEADER,
+      it_item TYPE ZLA_iT_type.
+DATA : lw_header LIKE LINE OF it_header,
+       lw_item LIKE LINE OF it_item.
+
+DATA v_vbeln TYPE vbrk-vbeln.
+SELECT-OPTIONS s_vbeln FOR v_vbeln.
+
+START-OF-SELECTION.
+PERFORM get_data.
+END-OF-SELECTION.
+PERFORM display.
+*&---------------------------------------------------------------------*
+*& Form get_data
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM get_data .
+PERFORM get_billing_data IN PROGRAM ZLA_BILLING_SUB USING S_VBELN[]
+                                                          CHANGING it_header it_item.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form display
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display .
+
+
+WRITE : /'DOCUMENT NO',
+           'Payer',
+           'Date',
+           'Net Value'.
+  LOOP AT it_header INTO lw_header.
+
+    WRITE : / lw_header-vbeln,
+              20 lw_header-name1,
+              40 lw_header-fkdat,
+              60 lw_header-netwr.
+CLEAR LW_HEADER.
+  ENDLOOP.
+
+  WRITE : / 'item',
+          40 'Material',
+          60 'Quantity',
+          75 'UoM',
+          90 'Net Value'.
+
+
+  LOOP AT it_item INTO lw_item where vbeln EQ lw_header-vbeln.
+    WRITE : / lw_item-posnr,
+         lw_item-matnr,
+         lw_item-fkimg,
+         lw_item-vrkme,
+         lw_item-netwr.
+CLEAR LW_ITEM.
+  ENDLOOP.
+
+ENDFORM.
