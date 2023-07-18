@@ -1,0 +1,95 @@
+3.zla_billing_footer
+
+*&---------------------------------------------------------------------*
+*& Report ZLA_BILLING_FOOTER
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zla_billing_footer LINE-COUNT 7(2).
+
+TYPES : BEGIN OF ty_kna1,
+         kunnr TYPE kna1-kunnr,
+         name1 TYPE kna1-name1,
+       END OF ty_kna1.
+
+
+
+TYPES : BEGIN OF ty_t006a,
+          msehi TYPE t006a-msehi,
+         mseht TYPE t006a-mseht,
+       END OF ty_t006a.
+DATA v_vbeln TYPE zla_vbrk-vbeln.
+
+DATA : it_vbrk TYPE TABLE OF zla_vbrk,
+       wa_vbrk LIKE LINE OF it_vbrk.
+DATA : it_vbrp TYPE TABLE OF zla_vbrp,
+       wa_vbrp LIKE LINE OF it_vbrp.
+DATA :v_kunrg TYPE kunrg,
+      v_fkdat TYPE FKDAT,
+      V_NETWR TYPE NETWR.
+
+DATA : it_header TYPE ZDEMO_T_HEADER,
+       wa_header LIKE LINE OF it_header.
+DATA :it_item TYPE ZLA_iT_type,
+      wa_item LIKE LINE OF it_item.
+
+DATA it_kna1 TYPE STANDARD TABLE OF ty_kna1.
+DATA it_t006a TYPE STANDARD TABLE OF ty_t006a.
+DATA : wa_kna1 LIKE LINE OF it_kna1,
+      wa_t006a LIKE LINE OF it_t006a.
+
+START-OF-SELECTION.
+  SELECT-OPTIONS s_VBELN FOR wa_vbrk-vbeln.
+
+ PERFORM get_header IN PROGRAM ZLA_BILLING_SUB USING s_vbeln[]
+                                             CHANGING it_header.
+  PERFORM get_item IN PROGRAM ZLA_BILLING_SUB USING s_vbeln[]
+                                               CHANGING it_item.
+
+
+*SELECT * FROM ZLA_VBRP INTO TABLE it_vbrp WHERE vbeln IN s_vbeln.
+*  IF sy-subrc IS INITIAL.
+*    SELECT msehi mseht FROM t006a INTO TABLE it_t006a FOR ALL ENTRIES IN it_vbrp WHERE msehi EQ it_vbrp-vrkme.
+*  ENDIF.
+
+  WRITE : /'DOCUMENT NO',
+           'Payer',
+           'Date',
+           'Net Value'.
+  LOOP AT it_header INTO wa_header.
+
+    WRITE : / wa_header-vbeln,
+              20 wa_header-name1,
+              40 wa_header-fkdat,
+              60 wa_header-netwr.
+    HIDE wa_header-vbeln.
+    SKIP.
+    CLEAR wa_header.
+  ENDLOOP.
+
+AT LINE-SELECTION.
+*   GET CURSOR VALUE V_VBELN.
+* SELECT * FROM zla_vbrp INTO TABLE it_vbrp WHERE vbeln EQ WA_VBRK-VBELN.
+
+  WRITE : / 'item',
+          40 'Material',
+          60 'Quantity',
+          75 'UoM',
+          90 'Net Value'.
+
+SORT IT_ITEM BY VBELN POSNR.
+  LOOP AT it_item INTO wa_item where vbeln eq wa_header-vbeln.
+*AT NEW VBELN.
+    WRITE : / wa_item-posnr,
+         wa_item-matnr,
+         wa_item-fkimg,
+         wa_item-vrkme,
+         wa_item-netwr.
+*  ENDAT.
+  ENDLOOP.
+
+TOP-OF-PAGE.
+  WRITE 'Billing Program'.
+
+END-OF-PAGE.
+  WRITE : / '******************This is electronic statement********************************'.
