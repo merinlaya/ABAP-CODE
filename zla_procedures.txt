@@ -1,0 +1,27 @@
+*&---------------------------------------------------------------------*
+*& Report ZLA_PROCEDURES
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZLA_PROCEDURES.
+DATA : v_matnr TYPE matnr,
+       v_spras TYPE spras,
+       v_maktx TYPE maktx.
+v_matnr = '000000000000000011'.
+v_spras = 'E'.
+
+PERFORM get_maktx USING V_MATNR V_SPRAS V_MAKTX.
+WRITE V_MAKTX.
+*&---------------------------------------------------------------------*
+*& Form get_maktx
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM get_maktx USING VALUE (P_V_MATNR)
+                       P_V_SPRAS
+   VALUE (P_V_MAKTX).
+select single maktx from makt into p_v_maktx WHERE matnr eq v_matnr and spras eq v_spras.
+ENDFORM.
