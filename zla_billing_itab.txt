@@ -1,0 +1,70 @@
+4.zla_billing_itab.
+*&---------------------------------------------------------------------*
+*& Report ZLA_BILLING
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zla_billing_itab.
+PARAMETERS: p_VBELN TYPE zla_vbrk-vbeln.
+
+TYPES: BEGIN OF ty_kna1,
+         name1 TYPE name1,
+       END OF ty_kna1.
+
+TYPES: BEGIN OF ty_t006a,
+         mseht TYPE mseht,
+       END OF ty_t006a.
+
+TYPES: BEGIN OF ty_ZLA_VBRK,
+         vbeln TYPE vbeln,
+         fkdat TYPE fkdat,
+         kunrg TYPE kunrg,
+         netwr TYPE netwr,
+       END OF ty_ZLA_VBRK.
+
+TYPES :BEGIN OF ty_ZLA_VBRP,
+         posnr TYPE posnr,
+         matnr TYPE matnr,
+         fkimg TYPE fkimg,
+         vrkme TYPE vrkme,
+         netwr TYPE  netwr,
+       END OF ty_ZLA_VBRP.
+
+DATA st_vbrk TYPE ty_zla_vbrk.
+DATA st_vbrp TYPE ty_zla_vbrp.
+
+
+    DATA:  it_ZLA_VBRP TYPE TABLE OF ty_ZLA_VBRP,
+      wa_ZLA_VBRP LIKE LINE OF it_ZLA_VBRP,
+      v_name1     TYPE ty_kna1,
+      v_msehi TYPE ty_t006a,
+      v_mseht     TYPE ty_t006a,
+      it_t006a    TYPE TABLE OF ty_t006a,
+      wa_t006a    LIKE LINE OF it_t006a.
+
+SELECT SINGLE vbeln fkdat kunrg netwr FROM zla_vbrk INTO st_vbrk WHERE vbeln EQ p_vbeln.
+SELECT SINGLE name1 FROM kna1 INTO v_name1 WHERE kunnr EQ st_vbrk-kunrg.
+
+WRITE: /'Doc No:',st_VBRK-vbeln,
+       /'Payer Name:',v_name1,
+       /'Date:',st_VBRK-fkdat,
+       /'NetValue:',st_VBRK-netwr.
+*
+WRITE: /'Item',
+       20 'Material',
+       40 'Qty',
+       60'UoM',
+       80 'NetValue'.
+SELECT * FROM zla_vbrp INTO TABLE it_zla_vbrp WHERE vbeln EQ p_vbeln.
+
+SELECT msehi mseht FROM t006a INTO TABLE it_t006a FOR ALL ENTRIES IN it_zla_vbrp WHERE spras EQ sy-langu AND msehi EQ it_zla_vbrp-vrkme.
+*
+LOOP AT IT_zla_vbrp INTO WA_zla_vbrp.
+  READ TABLE it_t006a INTO wa_t006a WITH KEY msehi = wa_zla_vbrp-vrkme.
+  WRITE:/ wa_ZLA_VBRP-posnr,
+      20 wa_ZLA_VBRP-matnr,
+      30 wa_ZLA_VBRP-fkimg,
+      60 v_mseht,
+      68 wa_ZLA_VBRP-netwr.
+ENDLOOP.
+*
