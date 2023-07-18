@@ -1,0 +1,10 @@
+9.ZLA_DEMO_FIRST_PROGRAM
+*&---------------------------------------------------------------------*
+*& Report ZLA_DEMO_FIRST_PROGRAM
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZLA_DEMO_FIRST_PROGRAM.
+PARAMETERS p_name TYPE C LENGTH 20.
+WRITE 'My name is Laya'.
+WRITE P_NAME.
