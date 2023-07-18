@@ -1,0 +1,24 @@
+12.ZLA_FMCOUNT
+*&---------------------------------------------------------------------*
+*& Report ZLA_FMCOUNT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZLA_FMCOUNT.
+DATA: lv_doc TYPE I VALUE 5.
+DATA: lv_next_number TYPE I.
+
+CALL FUNCTION 'ZLA_FMCOUNT'
+  EXPORTING
+    next_number       = lv_doc
+ IMPORTING
+  V_DOC             = lv_next_number
+          .
+CALL FUNCTION 'ZLA_FMCOUNT'
+  EXPORTING
+    next_number       = lv_doc
+ IMPORTING
+  V_DOC             = lv_next_number
+          .
+
+WRITE: 'Number of calls:', lv_next_number.
